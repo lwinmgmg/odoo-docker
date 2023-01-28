@@ -1,11 +1,11 @@
 FROM alpine:latest AS gitcloner
-ENV ODOO_VERSION=15.0
+ENV ODOO_VERSION=16.0
 ENV ODOO_REPO=https://github.com/lwinmgmg/odoo.git
 RUN apk update && apk add git
 
 RUN git clone --depth 1 -b ${ODOO_VERSION} ${ODOO_REPO}
 
-FROM python:3.9-slim-bullseye
+FROM python:3.10-slim-bullseye
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
@@ -63,14 +63,14 @@ RUN apt-get clean && \
     apt-get autoclean && \
     apt-get autoremove
 
-RUN python -m pip install setuptools==62.6.0 && \
-    python -m pip install pip==22.1.2
+RUN python -m pip install setuptools==66.1.1 && \
+    python -m pip install pip==22.3.1
 
-ARG ODOO_RELEASE=20220626
+ARG ODOO_RELEASE=20230128
 
 ENV PATH=${PATH}:/usr/lib/postgresql/14/bin
 ENV ODOO_USER=odoo
-ENV ODOO_VERSION=15.0
+ENV ODOO_VERSION=16.0
 ENV ODOO_USER_HOME_DIR="/home/${ODOO_USER}"
 ENV ODOO_USER_UID=999
 ENV ODOO_INSTALL_DIR="${ODOO_USER_HOME_DIR}/${ODOO_VERSION}"
@@ -83,6 +83,7 @@ RUN groupadd --gid ${ODOO_USER_UID} ${ODOO_USER} \
 RUN chown odoo:odoo -R ${ODOO_USER_HOME_DIR}
 
 COPY --from=gitCloner --chown=${ODOO_USER}:${ODOO_USER} /odoo ${ODOO_INSTALL_DIR}/
+COPY dev-requirements.txt ${ODOO_INSTALL_DIR}/.
 
 RUN mkdir /etc/odoo && chown odoo:odoo -R /etc/odoo
 RUN mkdir /var/lib/odoo && chown odoo:odoo -R /var/lib/odoo
@@ -100,6 +101,7 @@ ENV PATH=${ODOO_USER_HOME_DIR}/.venv/bin:${PATH}
 WORKDIR ${ODOO_INSTALL_DIR}
 
 RUN pip install -r requirements.txt
+RUN pip install -r dev-requirements.txt
 
 COPY ./entrypoint.sh /
 COPY ./odoo.conf /etc/odoo/
