@@ -1,9 +1,14 @@
 FROM alpine:latest AS gitcloner
 ENV ODOO_VERSION=16.0
-ENV ODOO_REPO=https://github.com/lwinmgmg/odoo.git
-RUN apk update && apk add git
+ENV ODOO_REPO=https://github.com/lwinmgmg/odoo
 
-RUN git clone --depth 1 -b ${ODOO_VERSION} ${ODOO_REPO}
+WORKDIR /build
+
+RUN wget ${ODOO_REPO}/archive/refs/heads/${ODOO_VERSION}.zip
+
+RUN unzip 16.0.zip
+
+RUN ls -ahl
 
 FROM python:3.10-slim-bullseye
 
@@ -38,7 +43,7 @@ RUN apt-get update && \
                 xz-utils \
                 wkhtmltopdf
 
-RUN apt-get -y install libpq5=13.7-0+deb11u1 && \
+RUN apt-get -y install libpq5 && \
     apt-get install -y libsasl2-dev \
                         libldap2-dev \
                         libssl-dev \
@@ -82,7 +87,8 @@ RUN groupadd --gid ${ODOO_USER_UID} ${ODOO_USER} \
 
 RUN chown odoo:odoo -R ${ODOO_USER_HOME_DIR}
 
-COPY --from=gitCloner --chown=${ODOO_USER}:${ODOO_USER} /odoo ${ODOO_INSTALL_DIR}/
+COPY --from=gitCloner --chown=${ODOO_USER}:${ODOO_USER} /build/odoo-16.0 ${ODOO_INSTALL_DIR}/
+
 COPY dev-requirements.txt ${ODOO_INSTALL_DIR}/.
 
 RUN mkdir /etc/odoo && chown odoo:odoo -R /etc/odoo
