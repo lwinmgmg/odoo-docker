@@ -8,8 +8,6 @@ RUN wget ${ODOO_REPO}/archive/refs/heads/${ODOO_VERSION}.zip
 
 RUN unzip 16.0.zip
 
-RUN ls -ahl
-
 FROM python:3.10-slim-bullseye
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
@@ -40,8 +38,13 @@ RUN apt-get update && \
                 python3-watchdog \
                 python3-xlrd \
                 python3-xlwt \
-                xz-utils \
-                wkhtmltopdf
+                xz-utils
+
+RUN apt-get install -y wget
+
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.stretch_amd64.deb && \
+    apt-get install -y ./wkhtmltox_0.12.5-1.stretch_amd64.deb && \
+    rm wkhtmltox_0.12.5-1.stretch_amd64.deb
 
 RUN apt-get -y install libpq5 && \
     apt-get install -y libsasl2-dev \
