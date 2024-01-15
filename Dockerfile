@@ -1,14 +1,15 @@
 FROM alpine:latest AS gitcloner
-ENV ODOO_VERSION=16.0
-ENV ODOO_REPO=https://github.com/lwinmgmg/odoo
+ENV ODOO_VERSION=17.0
+ENV COMMIT_REF=579ee6d9792050955fa80346fd57ad294efcdd62
+ENV ODOO_REPO=https://github.com/odoo/odoo
 
 WORKDIR /build
 
 RUN wget ${ODOO_REPO}/archive/refs/heads/${ODOO_VERSION}.zip
 
-RUN unzip 16.0.zip
+RUN unzip ${ODOO_VERSION}.zip
 
-FROM python:3.10-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
@@ -78,7 +79,7 @@ ARG ODOO_RELEASE=20230128
 
 ENV PATH=${PATH}:/usr/lib/postgresql/14/bin
 ENV ODOO_USER=odoo
-ENV ODOO_VERSION=16.0
+ENV ODOO_VERSION=17.0
 ENV ODOO_USER_HOME_DIR="/home/${ODOO_USER}"
 ENV ODOO_USER_UID=999
 ENV ODOO_INSTALL_DIR="${ODOO_USER_HOME_DIR}/${ODOO_VERSION}"
@@ -90,12 +91,12 @@ RUN groupadd --gid ${ODOO_USER_UID} ${ODOO_USER} \
 
 RUN chown odoo:odoo -R ${ODOO_USER_HOME_DIR}
 
-COPY --from=gitCloner --chown=${ODOO_USER}:${ODOO_USER} /build/odoo-16.0 ${ODOO_INSTALL_DIR}/
+COPY --from=gitCloner --chown=${ODOO_USER}:${ODOO_USER} "/build/odoo-${ODOO_VERSION}" ${ODOO_INSTALL_DIR}/
 
 COPY dev-requirements.txt ${ODOO_INSTALL_DIR}/.
 
-RUN mkdir /etc/odoo && chown odoo:odoo -R /etc/odoo
-RUN mkdir /var/lib/odoo && chown odoo:odoo -R /var/lib/odoo
+RUN mkdir -p /etc/odoo && chown odoo:odoo -R /etc/odoo
+RUN mkdir -p /var/lib/odoo && chown odoo:odoo -R /var/lib/odoo
 ENV DATA_DIR=${ODOO_USER_HOME_DIR}/.local/share/Odoo
 RUN mkdir -p ${DATA_DIR} && chown odoo:odoo ${DATA_DIR}
 

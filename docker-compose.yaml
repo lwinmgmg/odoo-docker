@@ -4,5 +4,5 @@ services:
   odoo-fr:
       container_name: web
       build: .
-#      command: "python odoo-bin -u frnt_loan,frnt_common,frnt_document,frnt_partner,frnt_address,frnt_personal_info,module_updater,token_base_auth,data_sync,account_common,stock_common,frnt_loan,wallet_common,wallet --db_host=172.16.250.78 --db_port=5432 -r opi -w frontiir"
+#      command: "python odoo-bin --db_host=172.16.250.78 --db_port=5432 -r opi -w frontiir"
       command: "python odoo-bin -d odoo15test --db_host=192.168.1.8 --db_port=5432 -r opi -w letmein"
