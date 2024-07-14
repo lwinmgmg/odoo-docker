@@ -1,6 +1,10 @@
-name: Odoo Docker Build                                                                                                                                                                                                                                                                                                                                                                                                           on:                                                                                                                                                                                                                push:                                                                                                                                                                                                              branches: [ "*" ]
+name: Odoo Docker Build
+on:
+  push:
+    branches: [ "*" ]
     tags:
-      - "*"                                                                                                                                                                                                                                                                                                                                                                                                                       jobs:
+      - "*"
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
