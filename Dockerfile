@@ -1,7 +1,7 @@
 FROM alpine:latest AS gitcloner
 ENV ODOO_VERSION=17.0
 ENV COMMIT_REF=579ee6d9792050955fa80346fd57ad294efcdd62
-ENV ODOO_REPO=https://github.com/odoo/odoo
+ENV ODOO_REPO=https://github.com/lwinmgmg/odoo
 
 WORKDIR /build
 
